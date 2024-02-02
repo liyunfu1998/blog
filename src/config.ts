@@ -4,7 +4,7 @@ export const SITE: Site = {
   website: "https://blog.liyunfu.tech/", // replace this with your deployed domain
   author: "李云富",
   desc: "A minimal, responsive and SEO-friendly Astro blog theme.",
-  title: "云富的编程笔记",
+  title: "编程笔记",
   ogImage: "astropaper-og.jpg",
   lightAndDarkMode: true,
   postPerPage: 3,
@@ -39,6 +39,18 @@ export const SOCIALS: SocialObjects = [
     name: "Twitter",
     href: "https://github.com/satnaing/astro-paper",
     linkTitle: `${SITE.title} on Twitter`,
+    active: false,
+  },
+  {
+    name: "Wechat",
+    href: "http://assets.liyunfu.tech/images/202402021149917.jpg",
+    linkTitle: `${SITE.title} on Wechat`,
+    active: true,
+  },
+  {
+    name: "Juejin",
+    href: "https://juejin.cn/user/2277843824292183",
+    linkTitle: `${SITE.title} on Juejin`,
     active: true,
   },
   {
