@@ -5,8 +5,6 @@ pubDatetime: 2024-01-15T15:11:00Z
 slug: ssr-mvp
 ---
 
-> 大家好，我是点外卖也分期的李一疯，今天带来最近[SSR 实战：官网开发指南 - 祯民 - 掘金小册 (juejin.cn)](https://juejin.cn/book/7137945369635192836?utm_source=course_list)学习SSR相关收获
-
 ## 手动搭一个SSR项目
 
 ## 针对大图低网速加载场景的首屏优化方案

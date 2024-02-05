@@ -16,7 +16,7 @@ canonicalURL: "https://blog.liyunfu.tech/posts/react-native-support-web"
 
 上一节，我们搭建了代码的 lint，写了一个很简单的服务器端 demo，并通过运行构建产物的方式运行了项目，对于上次的页面，大家打开 network 可以看到它向服务器端的请求是一个完整的 HTML。
 
-![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/263f09614cbf41ef9299c47f188f6f22~tplv-k3u1fbpfcp-watermark.image?)
+![image.png](http://assets.liyunfu.tech/images/202402052208489.png)
 
 在前几节，我们介绍过服务器端渲染的特点就是所有 dom 、数据的拼接在服务器端完成，使得在客户端拿到的是一个完整的 url，这个其实就是服务器端渲染，但是这里我们是通过 send 直接返回的 HTML 字符串，和我们渲染静态页面的预期还有差距，那么我们应该怎么在现在的基础上去渲染一个静态页面呢？
 
@@ -96,12 +96,12 @@ childProcess.exec("start http://127.0.0.1:3000");
 
 刷新一下页面：
 
-![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/5573f7909c3c4b3fa16a29197685f9aa~tplv-k3u1fbpfcp-watermark.image?)
+![image.png](http://assets.liyunfu.tech/images/202402052208496.png)
 可以看到，已经可以渲染出页面，不过按钮上的事件没绑定上去，点 alert 是没有反应的，因为 rendertoString 只是渲染页面，而事件相关的绑定是没办法在服务器端中进行的，那我们怎么才能把事件绑定到静态页面呢？
 
 之前我们有介绍过，掘金也是服务端渲染，我们看看它是怎么做的。
 
-![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/caac374cfbd34b8fa47879f1660a5357~tplv-k3u1fbpfcp-watermark.image?)
+![image.png](http://assets.liyunfu.tech/images/202402052208508.png)
 可以看到，掘金服务端返回的 HTML 文本中包括一组打包过后的 JS，这个其实就是这个页面所对应的相关事件和脚本，我们只需要打包过后将 JS 绑定在 HTML 中就可以。
 
 **这个也叫“同构”，是服务器端渲染的核心概念**，同一套 React 代码在服务器端渲染一遍，然后在客户端再执行一遍。服务端负责静态 dom 的拼接，而客户端负责事件的绑定，不仅是模板页面渲染，后面的路由，数据的请求都涉及到同构的概念。可以理解成，服务器端渲染都是基于同构去展开的，大家这里关注一下这个概念，对后面的学习理解会有很大的帮助
@@ -179,7 +179,7 @@ module.exports = merge(baseConfig, {
 
 我们执行一下`npm run build:client` 看看构建结果：
 
-![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/6c169c82fba449809d132c6febf040ac~tplv-k3u1fbpfcp-watermark.image?)
+![image.png](http://assets.liyunfu.tech/images/202402052208511.png)
 
 可以看到构建成功了，并且页面目录下会生成对应的 build_client/index.js 的构建文件，下一步我们将 index.js 加入到返回的 HTML 中：
 
@@ -216,7 +216,7 @@ childProcess.exec("start http://127.0.0.1:3000");
 
 在上面的代码中，`app.use(express.static(path.resolve(process.cwd(), "client_build")));`我们将对应的打包文件作为静态文件导入，然后在 script中引入对应的路由访问即可，这时候大家可以运行`npm run start`看一下结果了：
 
-![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/c8aabcb9f15745268d7bc7b5cddfe4ca~tplv-k3u1fbpfcp-watermark.image?)
+![image.png](http://assets.liyunfu.tech/images/202402052208569.png)
 可以看到，已经有对应静态资源的请求了，页面也已经可以绑定事件了，到这里模板页面的渲染就已经完成了。
 
 # 路由的匹配
@@ -343,7 +343,7 @@ childProcess.exec("start http://127.0.0.1:3000");
 
 做完这些路由的改造就完成了，还是很简单的，只是在客户端和服务器端都进行路由配置即可，这时候大家可以重新运行，打开 http://127.0.0.1:3000/demo，可以看到已经可以进行路由匹配了。
 
-![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/e8b8585a5d524ff0905ca70d0d8336eb~tplv-k3u1fbpfcp-watermark.image?)
+![image.png](http://assets.liyunfu.tech/images/202402052208580.png)
 因为存在客户端路由和服务端路由，所以服务器端渲染通过不同的方式跳转也会采用不同的渲染方式，当使用 React 内置的路由跳转的时候，会进行客户端路由的跳转，采用客户端渲染；而通过 a 标签，或者原生方式打开一个新页面的时候，才会进行服务器端路由的跳转，使用服务器端渲染。
 
 我们可以做个小实验来验证一下，改造 home 页面如下：
@@ -382,16 +382,16 @@ export default Home;
 
 我们加上了两个跳转，刷新页面，当点击“**链接跳转** **”** 的时候，可以看到 network 中会有对服务器端的请求，所以是通过服务器端渲染的页面。
 
-![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/dee615f8810544a8b777632ecbb51d7c~tplv-k3u1fbpfcp-watermark.image?)
+![image.png](http://assets.liyunfu.tech/images/202402052208797.png)
 当我们点击“**路由跳转** **”** 的时候，走的是客户端路由，这时候打开的页面将不是服务器端渲染，而是会走客户端渲染兜底，可以看到 network 中是没有对服务器端的 HTML 请求的。
 
-![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/374ed47e47994e0db7160483532563c4~tplv-k3u1fbpfcp-watermark.image?)
+![image.png](http://assets.liyunfu.tech/images/202402052208848.png)
 
 # Header 标签的修改
 
 上面我们一起来实践了 SSR 的模板页面的渲染和路由匹配，不过这个还不能满足我们所有静态页面的需求，因为模板页面只是影响到 body 的部分，修改不同路由下对应的标题，多媒体适配或是 SEO 时加入的相关 meta 关键字，都需要加入相关的 header。
 
-![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/fa55dce108af4e5683ea3d142a4fef80~tplv-k3u1fbpfcp-watermark.image?)
+![image.png](http://assets.liyunfu.tech/images/202402052208867.png)
 我们进入正题，服务器端渲染怎么才能修改到对应的 header 呢？可以使用 react-helmet 来实现我们的需求，这个依赖支持对文档头进行调整，我们先来安装一下依赖：
 
 ```
@@ -493,13 +493,13 @@ childProcess.exec("start http://127.0.0.1:3000");
 
 `Helmet.renderStatic()`可以提供渲染时添加的所有内容，这样我们就已经完成 header 标签的修改了，可以刷新一下页面看一下效果：
 
-![image.png](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/b43b3830b212463fb9faf28072bb30a4~tplv-k3u1fbpfcp-watermark.image?)
+![image.png](http://assets.liyunfu.tech/images/202402052208910.png)
 
 # 小结
 
 这一节课，我们学习了如何实现 SSR 的静态页面渲染，包括模板页面的渲染、路由的匹配和 Header 标签的修改，同时也介绍了服务器端渲染中一个很重要的概念 -- 同构，相信大家学习后对服务器端渲染已经有了一个相对深刻的了解，同学们也可以结合下面画的思维导图回忆温习一下今天的内容，加深对整个过程的理解。
 
-![image.png](http://assets.liyunfu.tech/images/202401261513012.png)
+![image.png](http://assets.liyunfu.tech/images/202402052208976.png)
 
 现在我们已经实现了静态页面的部分，但是实际上，并不是所有的数据都是静态的，往往需要通过接口的请求来拿到预期的数据。所以在下节课，我们将来学习，如何支持 SSR 的数据请求。
 
@@ -611,7 +611,7 @@ export default Demo;
 
 然后我们刷新一下 Demo 页面看看：
 
-<img src="https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/e824dd29b0214eddaf7ea8a1235d3ba0~tplv-k3u1fbpfcp-watermark.image?" alt="image.png"  />
+<img src="http://assets.liyunfu.tech/images/202402052208035.png" alt="image.png"  />
 数据请求成功了，不过，不对的是，我们可以在 network 中看到对应的请求，数据也没在服务器端请求的时候塞入 HTML，也就是说走的是客户端渲染，而不是服务端渲染，和我们预期的不一样，看来是不能直接用 hook 来常规请求的。
 
 我们来回忆之前静态页面的思路，是在服务器端拼凑好 HTML 并返回，所以请求的话，咱们应该也是获取到每个模板页面初始化的请求，并在服务器端请求好，进行 HTML 拼凑，在这之前我们需要建立一个全局的 store，使得服务端请求的数据可以提供到模板页面来进行操作。确认好思路，咱们就根据这个思路先来解决试试。
@@ -882,10 +882,10 @@ export default storeDemo;
 
 到这里我们的全局 store 就建立了，我们可以刷新一下页面试试。
 
-![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/864e92b0f62146e18cc961179d126c41~tplv-k3u1fbpfcp-watermark.image?)
+![image.png](http://assets.liyunfu.tech/images/202402052208181.png)
 可以看到展示的是默认数据，那是因为我们并没有进行初始化的请求，所以它走了默认的 state 兜底，然后我们点击刷新试试。
 
-![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/553e74ee93ba4490b286468c9828a252~tplv-k3u1fbpfcp-watermark.image?)
+![image.png](http://assets.liyunfu.tech/images/202402052208220.png)
 可以看到新增了对应的请求，对应展示的内容也切换为了刷新过后的数据，那这就意味着咱们 store的部分已经走通了，接下来咱们只需要考虑，应该怎样在服务器端进行请求，使得在 html 拼接的时候就可以拿到初始化的数据呢？
 
 # 建立服务器端请求数据体系
@@ -1094,7 +1094,7 @@ childProcess.exec("start http://127.0.0.1:3000");
 
 到这里服务器端请求就走通了，我们重启项目访问一下 Demo 页面试试：
 
-![image.png](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/7cb04622b30240b58c65743057eee21a~tplv-k3u1fbpfcp-watermark.image?)
+![image.png](http://assets.liyunfu.tech/images/202402052208370.png)
 但是很奇怪的是，可以看到服务器端的返回其实是符合预期的，是“这是初始化的demo"，但是页面展示的时候却是默认数据，这是为什么呢？
 
 其实很简单，因为客户端和服务器端的 store 是不同步的，服务器端请求完成填充 store 后，客户端的 JS 又执行了一遍 store，取了默认的值，所以导致数据不能同步。要解决这个问题，就需要使用脱水和注水的方式。
@@ -1248,7 +1248,7 @@ export { demoReducer, getDemoData };
 
 然后我们再重新刷新一下页面看看效果，应该就可以了：
 
-![image.png](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d83e53f2ab6e4156af6b5dc4539f1dab~tplv-k3u1fbpfcp-watermark.image?)
+![image.png](http://assets.liyunfu.tech/images/202402052208551.png)
 
 # 小结
 
