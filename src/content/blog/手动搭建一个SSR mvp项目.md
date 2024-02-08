@@ -7,6 +7,331 @@ slug: ssr-mvp
 
 ## 手动搭一个SSR项目
 
+### 服务器端渲染的优点
+
+- 提高渲染速度：它在服务器上进行预渲染并减少加载时间
+- 更好的搜索引擎优化：搜索引擎变得更好，因为它们可以轻松地对SSR应用程序中的内容进行排名和索引
+- 增强的用户体验：用户可以更快地获得内容并增强性能
+- 可及性：即使禁止了javascript，用户也可以使用内容
+- 在社交媒体上分享：在社交媒体平台上共享URL时，它会生成准确的预览
+
+### 一个完整的SSR项目需要实现什么
+
+- 设置服务器：选择服务器端框架(如Express.js)来处理SSR请求
+- React水合作用：在服务器上呈现HTML后，javascript会使其具有交互性
+- 获取数据：异步数据提取或在渲染前获取内容等技术`getInitialProps`
+- 处理路由：配置服务器路由以处理不同的URL和路由
+
+### 优化SSR应用中的性能
+
+- 缓存：缓存可以缩短渲染时间，因为缓存会渲染页面并缩短加载时间
+- ISR：ISR是增量静态再生，它使用动态数据生成和缓存页面
+- 客户端导航：初始加载后，客户端导航可改善用户体验
+
+### 实现基于React的SSR
+
+#### 步骤一：写一个最简SSR
+
+目前我们的服务端框架选择的是`Express.js`，打包工具选择的是`Webpack`，现在就先将依赖安装完成吧
+
+```shell
+pnpm i express
+pnpm i @babel/preset-env babel-loader nodemon ts-loader webpack webpack-cli webpack-merge -D
+```
+
+先在根目录下新建`src/server/index.js`
+
+```shell
+mkdir -p src/server
+touch src/server/index.js
+```
+
+编辑`index.js`
+
+```js
+import express from "express";
+import childProcess from "child_process";
+
+const app = express();
+
+app.get("*", (req, res) => {
+  res.send(`
+    <html>
+      <body>
+        <div>hello ssr</div>
+      </body>
+    </html>
+  `);
+});
+
+app.listen(3000, () => {
+  console.log("Server is listening on port 3000");
+});
+
+childProcess.exec("start http://localhost:3000/");
+```
+
+现在来配置`webpack.base.js`，主要是配置针对js、ts的通用loader方案
+
+```js
+const path = require("path");
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        loader: "babel-loader",
+        exclude: /node_modules/,
+        options: {
+          presets: ["@babel/preset-env"],
+        },
+      },
+      {
+        test: /.(ts|tsx)$/,
+        use: "ts-loader",
+        exclude: /node_modules/,
+      },
+    ],
+  },
+  resolve: {
+    extensions: [".tsx", ".ts", ".js"],
+    alias: {
+      "@": path.resolve(process.cwd(), "src"),
+    },
+  },
+};
+```
+
+继续配置`webpack.server.js`，配置入口文件，及打包结果
+
+```js
+const { merge } = require("webpack-merge");
+const baseConfig = require("./webpack.base");
+
+module.exports = merge(baseConfig, {
+  mode: "development",
+  entry: "./src/server/index.js",
+  target: "node",
+  output: {
+    filename: "bundle.js",
+    path: path.resolve(__dirname, "server_build"),
+  },
+});
+```
+
+设置`package.json`的脚本命令
+
+```json
+  "scripts": {
+    "start": "npx nodemon server_build/bundle.js",
+    "build:server": "npx webpack build --config ./webpack.server.js --watch"
+  },
+```
+
+运行`npm run build:server`后可以看到成功打包后的文件`server_build/bundle.js`
+
+现在我们运行`npm run start` 打开浏览器页面刷新可以在`Network`中看到请求的数据
+![ssr初版](https://assets.liyunfu.tech/images/202402081126036.png)
+
+目前我们看到的就是SSR初版，即拿回来的页面直接就是带有数据的，而不是客户端渲染那种只有一个`div id='root'`类型，当然现在这个版本是完全不能用的，先`pr`一波，顺便Tips：项目中还配置了`tsconfig.json`需要的前往仓库获取
+[SSR初版实现](https://github.com/liyunfu1998/react-ssr-template/commit/37630e96ec62c362fea4a35ac27e261b4edae416)
+
+#### 步骤二：渲染静态DOM
+
+目前我们实现的只是一个模板字符串渲染，完全不可用，现在需要实现React组件渲染为字符串输出，下面来实现它吧
+
+我们需要先安装`React ReactDOM`的依赖
+
+```shell
+pnpm i react react-dom
+pnpm i @types/react @types/react-dom @types/node @babel/preset-react  -D
+```
+
+现在我们来写一个React的Home组件
+
+```shell
+mkdir -p src/pages/Home
+touche src/pages/Home/index.tsx
+```
+
+```js
+import { FC } from "react";
+
+const Home:FC=()=>{
+  return (
+    <div>
+      <h1>hello-ssr</h1>
+      <button onClick={():void=>{alert('hello-ssr')}}>alter</button>
+    </div>
+  )
+}
+
+export default Home
+```
+
+修改`tsconfig.json`配置，`noEmit`为`false`
+
+```json
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "types": ["node"], // 声明类型，使得ts-node支持对tsx的编译
+    "jsx": "react-jsx", // 全局导入, 不再需要每个文件定义react
+    "target": "es6",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": false,
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src/**/*"]
+}
+```
+
+修改`webpack.base.js`，对于js做loader的时候，还需要添加`react`预设，`presets: ["@babel/preset-env", "@babel/preset-react"],`
+
+然后我们在`src/server/index.js`中引入`Home`组件，转换成HTMl
+
+```js
+import express from "express";
+import childProcess from "child_process";
+import { renderToString } from "react-dom/server";
+import React from "react";
+import Home from "@/pages/Home";
+
+const app = express();
+const content = renderToString(<Home />); // 编译需要渲染的jsx，转换成对应的html
+
+app.get("*", (req, res) => {
+  const htmlDOM = `
+    <html>
+      <body>
+        <div id="root">${content}</div>
+      </body>
+    </html>
+  `;
+  res.send(htmlDOM);
+});
+
+app.listen(3000, () => {
+  console.log("Server is listening on port 3000");
+});
+
+childProcess.exec("start http://localhost:3000/");
+```
+
+现在打包并运行效果如下：
+![SSR渲染静态DOM](https://assets.liyunfu.tech/images/202402081245420.png)
+
+代码如下：[SSR渲染静态DOM](https://github.com/liyunfu1998/react-ssr-template/commit/af68ed4def79534823eb6dac97631e3a6f9553a9)
+为什么我们点击`alert`按钮没效果呢，这就涉及到`同构`了，即同一套React代码在服务器端渲染一遍，然后在客户端再执行一遍，服务端负责静态dom的拼接，而客户端负责事件的绑定，不仅是模板页面渲染，后面的路由，数据的请求都涉及到同构，
+
+#### 步骤三：实现客户端部分
+
+新增一个`src/client/index.tsx`，前面我们的`src/server/index.js`也可以改变为tsx结尾
+
+```js
+// src/client/index.tsx
+
+import { hydrateRoot } from "react-dom/client";
+import Home from "@/pages/Home";
+
+hydrateRoot(document.getElementById("root") as Document | Element, <Home />);
+```
+
+`hydrateRoot`需要指定一个绑定的真实`dom`，我们这里给他设置为`root`
+
+再进行客户端的`webpack.client.js`配置
+
+```js
+const path = require("path");
+const { merge } = require("webpack-merge");
+const baseConfig = require("./webpack.base");
+
+module.exports = merge(baseConfig, {
+  mode: "development",
+  entry: "./src/client/index.tsx",
+  output: {
+    filename: "index.js",
+    path: path.resolve(process.cwd(), "client_build"),
+  },
+});
+```
+
+主要逻辑就是打包，输出到`client_build`目录下
+
+然后我们在`src/server/index.tsx`中引入
+
+首先将`client_build`目录设置为静态资源目录
+
+```js
+app.use(express.static(path.resolve(process.cwd(), "client_build")));
+```
+
+然后在模板字符串里面引入脚本
+
+```js
+<script src="/index.js"></script>
+```
+
+完整`src/server/index.js`代码如下：
+
+```js
+import express from "express";
+import childProcess from "child_process";
+import { renderToString } from "react-dom/server";
+import React from "react";
+import Home from "@/pages/Home";
+import path from "path";
+
+const app = express();
+const content = renderToString(<Home />); // 编译需要渲染的jsx，转换成对应的html
+
+app.use(express.static(path.resolve(process.cwd(), "client_build")));
+
+app.get("*", (req, res) => {
+  const htmlDOM = `
+    <html>
+      <body>
+        <div id="root">${content}</div>
+        <script src="/index.js"></script>
+      </body>
+    </html>
+  `;
+  res.send(htmlDOM);
+});
+
+app.listen(3000, () => {
+  console.log("Server is listening on port 3000");
+});
+
+childProcess.exec("start http://localhost:3000/");
+```
+
+最后添加一个新的启动脚本命令
+
+```json
+"build:client": "npx webpack build --config ./webpack.client.js --watch",
+```
+
+运行情况如下：
+![SSR事件绑定](https://assets.liyunfu.tech/images/202402081316053.png)
+
+可以看到截图中，先请求的html页面，并且紧接着获取了`index.js`脚本，点击`alert`有效果了
+
+代码如下：[SSR事件绑定](https://github.com/liyunfu1998/react-ssr-template/commit/f5349bce32102ca9b969acc1ccba5094487a9765)
+
 ## 针对大图低网速加载场景的首屏优化方案
 
 ### 方案一

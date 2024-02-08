@@ -1,0 +1,301 @@
+<!DOCTYPE html><html lang="zh" class="scroll-smooth"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="canonical" href="https://blog.liyunfu.tech/posts/ssr-mvp/"><meta name="generator" content="Astro v4.1.1"><!-- General Meta Tags --><title>手动搭建一个SSR mvp项目</title><meta name="title" content="手动搭建一个SSR mvp项目"><meta name="description" content="手动搭建一个SSR mvp项目"><meta name="author" content="李云富"><link rel="sitemap" href="/sitemap-index.xml"><!-- Open Graph / Facebook --><meta property="og:title" content="手动搭建一个SSR mvp项目"><meta property="og:description" content="手动搭建一个SSR mvp项目"><meta property="og:url" content="https://blog.liyunfu.tech/posts/ssr-mvp/"><meta property="og:image" content="https://blog.liyunfu.tech/posts/%E6%89%8B%E5%8A%A8%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AAssr-mvp%E9%A1%B9%E7%9B%AE.png"><!-- Article Published/Modified time --><meta property="article:published_time" content="2024-01-15T15:11:00.000Z"><!-- Twitter --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://blog.liyunfu.tech/posts/ssr-mvp/"><meta property="twitter:title" content="手动搭建一个SSR mvp项目"><meta property="twitter:description" content="手动搭建一个SSR mvp项目"><meta property="twitter:image" content="https://blog.liyunfu.tech/posts/%E6%89%8B%E5%8A%A8%E6%90%AD%E5%BB%BA%E4%B8%80%E4%B8%AAssr-mvp%E9%A1%B9%E7%9B%AE.png"><!-- Google Font --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet"><meta name="theme-color" content=""><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><script src="/toggle-theme.js"></script><style>.breadcrumb:where(.astro-ilhxcym7){margin-left:auto;margin-right:auto;margin-bottom:.25rem;margin-top:2rem;width:100%;max-width:48rem;padding-left:1rem;padding-right:1rem}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7){display:inline}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7) a:where(.astro-ilhxcym7){text-transform:capitalize;opacity:.7}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7) span:where(.astro-ilhxcym7){opacity:.7}.breadcrumb:where(.astro-ilhxcym7) ul:where(.astro-ilhxcym7) li:where(.astro-ilhxcym7):not(:last-child) a:where(.astro-ilhxcym7):hover{opacity:1}
+</style>
+<link rel="stylesheet" href="/_astro/about.0_qUR80p.css" />
+<style>#main-content:where(.astro-hsp6otuf){margin-left:auto;margin-right:auto;width:100%;max-width:48rem;padding-left:1rem;padding-right:1rem;padding-bottom:1rem}#main-content:where(.astro-hsp6otuf) h1:where(.astro-hsp6otuf){font-size:1.5rem;line-height:2rem;font-weight:600}@media (min-width: 640px){#main-content:where(.astro-hsp6otuf) h1:where(.astro-hsp6otuf){font-size:1.875rem;line-height:2.25rem}}#main-content:where(.astro-hsp6otuf) p:where(.astro-hsp6otuf){margin-bottom:1.5rem;margin-top:.5rem;font-style:italic}
+a:where(.astro-blwjyjpt){position:relative;text-decoration-line:underline;text-decoration-style:dashed}a:where(.astro-blwjyjpt):hover{top:-.125rem;--tw-text-opacity: 1;color:rgba(var(--color-accent),var(--tw-text-opacity))}a:where(.astro-blwjyjpt):focus-visible{padding:.25rem}a:where(.astro-blwjyjpt) svg:where(.astro-blwjyjpt){margin-right:-1.25rem;height:1.5rem;width:1.5rem;--tw-scale-x: .95;--tw-scale-y: .95;transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skew(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));--tw-text-opacity: 1;color:rgba(var(--color-text-base),var(--tw-text-opacity));opacity:.8}.group:where(.astro-blwjyjpt):hover a:where(.astro-blwjyjpt) svg:where(.astro-blwjyjpt){fill:rgb(var(--color-accent))}
+.pagination-wrapper:where(.astro-d776pwuy){margin-bottom:2rem;margin-top:auto;display:flex;justify-content:center}.disabled:where(.astro-d776pwuy){pointer-events:none;-webkit-user-select:none;-moz-user-select:none;user-select:none;opacity:.5}.disabled:where(.astro-d776pwuy):hover{--tw-text-opacity: 1;color:rgba(var(--color-text-base),var(--tw-text-opacity))}.group:where(.astro-d776pwuy):hover .disabled:where(.astro-d776pwuy){fill:rgb(var(--color-text-base))}.group:where(.astro-d776pwuy):hover .disabled-svg:where(.astro-d776pwuy){fill:rgb(var(--color-text-base))!important}
+@keyframes astroFadeInOut{0%{opacity:1}to{opacity:0}}@keyframes astroFadeIn{0%{opacity:0}}@keyframes astroFadeOut{to{opacity:0}}@keyframes astroSlideFromRight{0%{transform:translate(100%)}}@keyframes astroSlideFromLeft{0%{transform:translate(-100%)}}@keyframes astroSlideToRight{to{transform:translate(100%)}}@keyframes astroSlideToLeft{to{transform:translate(-100%)}}@media (prefers-reduced-motion){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}[data-astro-transition-scope]{animation:none!important}}
+.social-icons:where(.astro-wkojbtzc){display:flex;flex-direction:column;flex-wrap:wrap;align-items:center;justify-content:center;gap:.25rem}@media (min-width: 640px){.social-icons:where(.astro-wkojbtzc){align-items:flex-start}}.link-button:where(.astro-wkojbtzc){--tw-scale-x: .9;--tw-scale-y: .9;transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skew(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));padding:.5rem}.link-button:where(.astro-wkojbtzc):hover{--tw-rotate: 6deg;transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skew(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@media (min-width: 640px){.link-button:where(.astro-wkojbtzc){padding:.25rem}}main:where(.astro-vj4tpspi){margin-left:auto;margin-right:auto;width:100%;max-width:48rem;padding-left:1rem;padding-right:1rem;padding-bottom:3rem}.post-title:where(.astro-vj4tpspi){font-size:1.5rem;line-height:2rem;font-weight:600;--tw-text-opacity: 1;color:rgba(var(--color-accent),var(--tw-text-opacity))}
+</style><script type="module" src="/_astro/hoisted.kOI_Zw2a.js"></script><style>[data-astro-transition-scope="astro-plk3gbjq-1"] { view-transition-name: ssr-mvp; }@layer astro { ::view-transition-old(ssr-mvp) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }::view-transition-new(ssr-mvp) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back]::view-transition-old(ssr-mvp) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back]::view-transition-new(ssr-mvp) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; } }[data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-plk3gbjq-1"],
+			[data-astro-transition-fallback="old"][data-astro-transition-scope="astro-plk3gbjq-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-plk3gbjq-1"],
+			[data-astro-transition-fallback="new"][data-astro-transition-scope="astro-plk3gbjq-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back][data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-plk3gbjq-1"],
+			[data-astro-transition=back][data-astro-transition-fallback="old"][data-astro-transition-scope="astro-plk3gbjq-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back][data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-plk3gbjq-1"],
+			[data-astro-transition=back][data-astro-transition-fallback="new"][data-astro-transition-scope="astro-plk3gbjq-1"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }</style><style>[data-astro-transition-scope="astro-36ssibgs-2"] { view-transition-name: others; }@layer astro { ::view-transition-old(others) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }::view-transition-new(others) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back]::view-transition-old(others) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back]::view-transition-new(others) { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; } }[data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-36ssibgs-2"],
+			[data-astro-transition-fallback="old"][data-astro-transition-scope="astro-36ssibgs-2"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-36ssibgs-2"],
+			[data-astro-transition-fallback="new"][data-astro-transition-scope="astro-36ssibgs-2"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }[data-astro-transition=back][data-astro-transition-fallback="old"] [data-astro-transition-scope="astro-36ssibgs-2"],
+			[data-astro-transition=back][data-astro-transition-fallback="old"][data-astro-transition-scope="astro-36ssibgs-2"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeOut; }[data-astro-transition=back][data-astro-transition-fallback="new"] [data-astro-transition-scope="astro-36ssibgs-2"],
+			[data-astro-transition=back][data-astro-transition-fallback="new"][data-astro-transition-scope="astro-36ssibgs-2"] { 
+	animation-duration: 180ms;
+	animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+	animation-fill-mode: both;
+	animation-name: astroFadeIn; }</style></head> <body>  <header class="astro-3ef6ksr2"> <a id="skip-to-content" href="#main-content" class="astro-3ef6ksr2">Skip to content</a> <div class="nav-container astro-3ef6ksr2"> <div class="top-nav-wrap astro-3ef6ksr2"> <a href="/" class="logo whitespace-nowrap astro-3ef6ksr2"> 编程笔记 </a> <nav id="nav-menu" class="astro-3ef6ksr2"> <button class="hamburger-menu focus-outline astro-3ef6ksr2" aria-label="Open Menu" aria-expanded="false" aria-controls="menu-items"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="menu-icon astro-3ef6ksr2"> <line x1="7" y1="12" x2="21" y2="12" class="line astro-3ef6ksr2"></line> <line x1="3" y1="6" x2="21" y2="6" class="line astro-3ef6ksr2"></line> <line x1="12" y1="18" x2="21" y2="18" class="line astro-3ef6ksr2"></line> <line x1="18" y1="6" x2="6" y2="18" class="close astro-3ef6ksr2"></line> <line x1="6" y1="6" x2="18" y2="18" class="close astro-3ef6ksr2"></line> </svg> </button> <ul id="menu-items" class="display-none sm:flex astro-3ef6ksr2"> <li class="astro-3ef6ksr2"> <a href="/posts" class=" astro-3ef6ksr2">
+Posts
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/tags" class=" astro-3ef6ksr2">
+Tags
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/about" class=" astro-3ef6ksr2">
+About
+</a> </li> <li class="astro-3ef6ksr2"> <a href="/search" class="group inline-block hover:text-skin-accent focus-outline p-3 sm:p-1  flex astro-3ef6ksr2" aria-label="search" title="Search"> <svg xmlns="http://www.w3.org/2000/svg" class="scale-125 sm:scale-100 astro-3ef6ksr2"><path d="M19.023 16.977a35.13 35.13 0 0 1-1.367-1.384c-.372-.378-.596-.653-.596-.653l-2.8-1.337A6.962 6.962 0 0 0 16 9c0-3.859-3.14-7-7-7S2 5.141 2 9s3.14 7 7 7c1.763 0 3.37-.66 4.603-1.739l1.337 2.8s.275.224.653.596c.387.363.896.854 1.384 1.367l1.358 1.392.604.646 2.121-2.121-.646-.604c-.379-.372-.885-.866-1.391-1.36zM9 14c-2.757 0-5-2.243-5-5s2.243-5 5-5 5 2.243 5 5-2.243 5-5 5z" class="astro-3ef6ksr2"></path> </svg> <span class="sr-only astro-3ef6ksr2">Search</span> </a> </li> <li class="astro-3ef6ksr2"> <button id="theme-btn" class="focus-outline astro-3ef6ksr2" title="Toggles light & dark" aria-label="auto" aria-live="polite"> <svg xmlns="http://www.w3.org/2000/svg" id="moon-svg" class="astro-3ef6ksr2"> <path d="M20.742 13.045a8.088 8.088 0 0 1-2.077.271c-2.135 0-4.14-.83-5.646-2.336a8.025 8.025 0 0 1-2.064-7.723A1 1 0 0 0 9.73 2.034a10.014 10.014 0 0 0-4.489 2.582c-3.898 3.898-3.898 10.243 0 14.143a9.937 9.937 0 0 0 7.072 2.93 9.93 9.93 0 0 0 7.07-2.929 10.007 10.007 0 0 0 2.583-4.491 1.001 1.001 0 0 0-1.224-1.224zm-2.772 4.301a7.947 7.947 0 0 1-5.656 2.343 7.953 7.953 0 0 1-5.658-2.344c-3.118-3.119-3.118-8.195 0-11.314a7.923 7.923 0 0 1 2.06-1.483 10.027 10.027 0 0 0 2.89 7.848 9.972 9.972 0 0 0 7.848 2.891 8.036 8.036 0 0 1-1.484 2.059z" class="astro-3ef6ksr2"></path> </svg> <svg xmlns="http://www.w3.org/2000/svg" id="sun-svg" class="astro-3ef6ksr2"> <path d="M6.993 12c0 2.761 2.246 5.007 5.007 5.007s5.007-2.246 5.007-5.007S14.761 6.993 12 6.993 6.993 9.239 6.993 12zM12 8.993c1.658 0 3.007 1.349 3.007 3.007S13.658 15.007 12 15.007 8.993 13.658 8.993 12 10.342 8.993 12 8.993zM10.998 19h2v3h-2zm0-17h2v3h-2zm-9 9h3v2h-3zm17 0h3v2h-3zM4.219 18.363l2.12-2.122 1.415 1.414-2.12 2.122zM16.24 6.344l2.122-2.122 1.414 1.414-2.122 2.122zM6.342 7.759 4.22 5.637l1.415-1.414 2.12 2.122zm13.434 10.605-1.414 1.414-2.122-2.122 1.414-1.414z" class="astro-3ef6ksr2"></path> </svg> </button> </li> </ul> </nav> </div> </div> <div class="max-w-3xl mx-auto px-4"> <hr class="border-skin-line" aria-hidden="true"> </div> </header>   <div class="mx-auto flex w-full max-w-3xl justify-start px-2 astro-vj4tpspi"> <button class="focus-outline mb-2 mt-8 flex hover:opacity-75 astro-vj4tpspi" onclick="history.back()"> <svg xmlns="http://www.w3.org/2000/svg" class="astro-vj4tpspi"><path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg><span class="astro-vj4tpspi">Go back</span> </button> </div> <main id="main-content" class="astro-vj4tpspi"> <h1 class="post-title astro-vj4tpspi" data-astro-transition-scope="astro-plk3gbjq-1">手动搭建一个SSR mvp项目</h1> <div class="flex items-center space-x-2 opacity-80 my-2 astro-vj4tpspi"><svg xmlns="http://www.w3.org/2000/svg" class="scale-100 inline-block h-6 w-6 min-w-[1.375rem] fill-skin-base" aria-hidden="true"><path d="M7 11h2v2H7zm0 4h2v2H7zm4-4h2v2h-2zm0 4h2v2h-2zm4-4h2v2h-2zm0 4h2v2h-2z"></path><path d="M5 22h14c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2h-2V2h-2v2H9V2H7v2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2zM19 8l.001 12H5V8h14z"></path></svg><span class="sr-only">Published:</span><span class="italic text-base"><time dateTime="2024-01-15T15:11:00.000Z">2024年1月15日</time><span aria-hidden="true"> | </span><span class="sr-only"> at </span><span class="text-nowrap">15:11</span></span></div> <article id="article" role="article" class="prose mx-auto mt-8 max-w-3xl astro-vj4tpspi"> <h2 id="手动搭一个ssr项目">手动搭一个SSR项目</h2>
+<h2 id="针对大图低网速加载场景的首屏优化方案">针对大图低网速加载场景的首屏优化方案</h2>
+<h3 id="方案一">方案一</h3>
+<p>针对该场景，我们首先需要知道的是什么时候是<code>低网速</code>的，目前浏览器提供了<code>navigator.connection.effectiveType</code>来获取当前的流量状态，这样我们就可以根据不同的网速场景，进行图片清晰度的选择，<code>API</code>返回的结果如下：</p>
+<ol>
+<li><code>slow-2g</code></li>
+<li><code>2g</code></li>
+<li><code>3g</code></li>
+<li><code>4g</code></li>
+</ol>
+<p>在低网速下优先加载0.5X或1X的图片，同时也加载2X的大图，通过隐藏DOM的方式隐性加载，然后监听2X资源的<code>onload</code>事件，在资源加载完成时，进行类的替换</p>
+<p>但是当前为实验性属性，兼容性不太好，如果用户非<code>safari</code> 、<code>firefox</code>用户，那可以尽情使用</p>
+<h3 id="方案二">方案二</h3>
+<p>针对不同的像素场景也需要使用响应式图片，即pc可能更清晰，h5可以低画质一些，浏览器给我们提供了<code>img srcset</code>和<code>picture</code>，可以根据不同的像素场景自动选取不同的元素进行适配</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#7F848E;font-style:italic">//img srcset</span></span>
+<span class="line"><span style="color:#ABB2BF">&#x3C;</span><span style="color:#E06C75">img</span><span style="color:#D19A66;font-style:italic"> srcset</span><span style="color:#56B6C2">=</span><span style="color:#98C379">"abc-480w.jpg 480, abc-800w.jpg 800w"</span><span style="color:#D19A66;font-style:italic"> sizes</span><span style="color:#56B6C2">=</span><span style="color:#98C379">"{max-width: 600px} 480px, 800px"</span><span style="color:#D19A66;font-style:italic"> src</span><span style="color:#56B6C2">=</span><span style="color:#98C379">"abc-800w.jpg"</span><span style="color:#ABB2BF">></span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#ABB2BF">// picture</span></span>
+<span class="line"><span style="color:#ABB2BF">&#x3C;</span><span style="color:#E06C75">picture</span><span style="color:#ABB2BF">></span></span>
+<span class="line"><span style="color:#ABB2BF">    &#x3C;</span><span style="color:#E06C75">source</span><span style="color:#D19A66;font-style:italic"> srcset</span><span style="color:#56B6C2">=</span><span style="color:#98C379">"/media/abc-240-200.jpg"</span><span style="color:#D19A66;font-style:italic"> media</span><span style="color:#56B6C2">=</span><span style="color:#98C379">"(min-width: 800px)"</span><span style="color:#ABB2BF">></span></span>
+<span class="line"><span style="color:#ABB2BF">    &#x3C;</span><span style="color:#E06C75">img</span><span style="color:#D19A66;font-style:italic"> src</span><span style="color:#56B6C2">=</span><span style="color:#98C379">"/media/abc-298-332.jpg"</span><span style="color:#ABB2BF"> /></span></span>
+<span class="line"><span style="color:#ABB2BF">&#x3C;/</span><span style="color:#E06C75">picture</span><span style="color:#ABB2BF">></span></span></code></pre>
+<h3 id="方案三">方案三</h3>
+<p>使用webp格式图片，基本上可以比原有jpg降低40%体积，因为一些浏览器不支持webp，需要进行兼容性判断：</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#C678DD">export</span><span style="color:#C678DD"> const</span><span style="color:#61AFEF"> getIsSupportWebp</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> (</span><span style="color:#E06C75;font-style:italic">context</span><span style="color:#ABB2BF">: </span><span style="color:#E5C07B">AppContext</span><span style="color:#ABB2BF">) </span><span style="color:#C678DD">=></span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#C678DD">    const</span><span style="color:#ABB2BF"> {</span><span style="color:#E5C07B">headers</span><span style="color:#56B6C2"> =</span><span style="color:#ABB2BF"> {} } </span><span style="color:#56B6C2">=</span><span style="color:#E5C07B"> context</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">ctx</span><span style="color:#ABB2BF">.</span><span style="color:#E06C75">req</span><span style="color:#56B6C2"> ||</span><span style="color:#ABB2BF"> {}</span></span>
+<span class="line"><span style="color:#C678DD">    return</span><span style="color:#E5C07B"> headers</span><span style="color:#ABB2BF">.</span><span style="color:#E5C07B">accept</span><span style="color:#ABB2BF">?.</span><span style="color:#61AFEF">include</span><span style="color:#ABB2BF">(</span><span style="color:#98C379">'image/webp'</span><span style="color:#ABB2BF">)</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span></code></pre>
+<h3 id="为什么在极快速度下webp反倒相对更慢">为什么在极快速度下webp反倒相对更慢</h3>
+<p>因为webp的低体积并不是毫无代价的，他在压缩过程中进行了<code>分块</code>、<code>帧内预测</code>、<code>量化</code>等操作，这些操作减少了webp的体积，但是作为交换的事，<code>需要更长的解析时间</code>，不过这不是受网速限制，是受浏览器限制，但是几毫秒差距的用户体验并不会多大影响，反倒是随着网速变差，体积优化的效果很显著</p>
+<h2 id="ios设备兼容">IOS设备兼容</h2>
+<h3 id="300-ms-delay">300 ms delay</h3>
+<p>在平时的开发事件的触发大部分都是立刻响应的，但是IOS设备，会有300ms的延迟，因为IOS浏览器双击屏幕可以进行缩放，当用户点击链接后，浏览器没办法判定用户是想双击缩放，还是进行点击事件触发，所以IOS Safari会统一等待300ms，来判断用户是否会再次点击屏幕</p>
+<h4 id="解决方案">解决方案</h4>
+<blockquote>
+<ol>
+<li>Meta禁止缩放</li>
+<li>更改视口尺寸</li>
+<li>Touch-action</li>
+</ol>
+</blockquote>
+<p><strong>Meta禁止缩放</strong>
+因为300ms延迟的初衷是为了解决点击和缩放没办法区分的问题，针对不需要缩放的页面，我们可以通过禁止缩放来解决，大部分页面都是可以避免缩放，通过某些交互样式来兼容缩放的</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#7F848E;font-style:italic">// 在head中加着两行即可</span></span>
+<span class="line"><span style="color:#ABB2BF">&#x3C;</span><span style="color:#E06C75">meta</span><span style="color:#D19A66;font-style:italic"> name</span><span style="color:#56B6C2">=</span><span style="color:#98C379">"viewport"</span><span style="color:#D19A66;font-style:italic"> content</span><span style="color:#56B6C2">=</span><span style="color:#98C379">"user-scalable=no"</span><span style="color:#ABB2BF"> ></span></span>
+<span class="line"><span style="color:#ABB2BF">&#x3C;</span><span style="color:#E06C75">meta</span><span style="color:#D19A66;font-style:italic"> name</span><span style="color:#56B6C2">=</span><span style="color:#98C379">"viewport"</span><span style="color:#D19A66;font-style:italic"> content</span><span style="color:#56B6C2">=</span><span style="color:#98C379">"initial-scale=1,maximum-scale=1"</span><span style="color:#ABB2BF">></span></span></code></pre>
+<p><strong>更改视口尺寸</strong>
+chrome对于<code>width=device-width</code>或者比<code>viewport</code>更小的页面禁用双击，但是IOS的Safari不支持，这个属性可以让浏览器自适应设备的屏幕尺寸</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#ABB2BF">&#x3C;</span><span style="color:#E06C75">meta</span><span style="color:#D19A66;font-style:italic"> name</span><span style="color:#56B6C2">=</span><span style="color:#98C379">"viewport"</span><span style="color:#D19A66;font-style:italic"> content</span><span style="color:#56B6C2">=</span><span style="color:#98C379">"width=device-width"</span><span style="color:#ABB2BF">></span></span></code></pre>
+<p><strong>Touch-action</strong></p>
+<blockquote>
+<p>这是草案</p>
+</blockquote>
+<p>使用css属性，<code>touch-action: none</code>可以移除目标元素的300ms delay</p>
+<h3 id="橡皮筋问题">橡皮筋问题</h3>
+<blockquote>
+<p>IOS上，当页面滚动到顶部或底部仍可向下或向上拖拽，并伴随一个弹性的效果，该效果被称为’rubber band’</p>
+</blockquote>
+<h4 id="解决方案-1">解决方案</h4>
+<p>我们给body甚至<code>overflow:hidden</code>，然后对根结点设置100页宽的高度，<strong>将外部body的滚动移动到页面内，这样外界的滚动相关的问题都会解决</strong>，因为我们页面采用的实际是内部滚动</p>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#ABB2BF">.</span><span style="color:#E06C75">forbidScroll</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">	height</span><span style="color:#ABB2BF">: 100</span><span style="color:#E06C75">vh</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#E06C75">	overflow</span><span style="color:#ABB2BF">: </span><span style="color:#E06C75">hidden</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"><span style="color:#E06C75">body</span><span style="color:#ABB2BF"> {</span></span>
+<span class="line"><span style="color:#E06C75">	overflow</span><span style="color:#ABB2BF">: </span><span style="color:#E06C75">hidden</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span>
+<span class="line"><span style="color:#ABB2BF">#</span><span style="color:#E06C75">__next</span><span style="color:#ABB2BF">: {</span></span>
+<span class="line"><span style="color:#E06C75">  height</span><span style="color:#ABB2BF">: 100</span><span style="color:#E06C75">vh</span><span style="color:#ABB2BF">;</span></span>
+<span class="line"><span style="color:#E06C75">  overflow</span><span style="color:#ABB2BF">: </span><span style="color:#E06C75">auto</span></span>
+<span class="line"><span style="color:#ABB2BF">}</span></span></code></pre>
+<h2 id="如何做seo优化">如何做SEO优化</h2>
+<h3 id="技术优化">技术优化</h3>
+<h4 id="语义化标签">语义化标签</h4>
+<blockquote>
+<ol>
+<li>H1是一个页面中权重最高，关键词优先级最高的文案，一个页面只能使用一个</li>
+<li>页面中我们通常只使用H1~H3，剩下的标题优先级太低，部分搜索引擎不会进行识别</li>
+<li>H标签通常不适用在文字logo、标题栏、侧边栏等每页固定存在的部分，因为这部分不属于这一页的重点，既不是与众不同的区域</li>
+</ol>
+</blockquote>
+<h4 id="meta">Meta</h4>
+<blockquote>
+<ol>
+<li>Title</li>
+<li>Description：页面描述，SEO的关键；PC端不要超过155个字符，移动端不要超过120个字符，如果过长，页面描述会被截断，反而影响最终的SEO</li>
+<li>Keywords：关键词，每个页面通常设置比较重要的3、4个关键字；关键词由高到低用逗号分隔，每个关键词都要是独特的，不要每个关键词意思差不多</li>
+<li>robots：是否开启搜索引擎抓去，noindex对应是否开启抓去，nofollow对应不追踪网页的链接，需要开启</li>
+<li>Applicable-device：告诉Google，你这个站点适配了那些设备，不加就是默认PC端，将会影响移动端搜索你站点</li>
+<li>Format-detection：在默认状态下，网页的数字会被认为是电话号码，点击数字会被当作电话号码，所以需要禁用</li>
+</ol>
+</blockquote>
+<pre class="astro-code one-dark-pro" style="background-color:#282c34;color:#abb2bf; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span>&#x3C;meta name="format-detection" content="telephone=no" /></span></span></code></pre>
+<h4 id="sitemap">Sitemap</h4>
+<p><a href="https://search.google.com/search-console/not-verified?original_url=/search-console/users&#x26;original_resource_id">欢迎使用 Google Search Console</a>
+在谷歌添加</p> </article> <ul class="my-8 astro-vj4tpspi"> <li class="inline-block my-1 underline-offset-4 astro-blwjyjpt"> <a href="/tags/others" class="text-sm pr-2 group astro-blwjyjpt" data-astro-transition-scope="astro-36ssibgs-2"> <svg xmlns="http://www.w3.org/2000/svg" class=" scale-75 astro-blwjyjpt"><path d="M16.018 3.815 15.232 8h-4.966l.716-3.815-1.964-.37L8.232 8H4v2h3.857l-.751 4H3v2h3.731l-.714 3.805 1.965.369L8.766 16h4.966l-.714 3.805 1.965.369.783-4.174H20v-2h-3.859l.751-4H21V8h-3.733l.716-3.815-1.965-.37zM14.106 14H9.141l.751-4h4.966l-.752 4z" class="astro-blwjyjpt"></path> </svg>
+&nbsp;<span class="astro-blwjyjpt">others</span> </a> </li>  </ul> <div class="flex flex-col-reverse items-center justify-between gap-6 sm:flex-row-reverse sm:items-end sm:gap-4 astro-vj4tpspi"> <button id="back-to-top" class="focus-outline whitespace-nowrap py-1 hover:opacity-75 astro-vj4tpspi"> <svg xmlns="http://www.w3.org/2000/svg" class="rotate-90 astro-vj4tpspi"> <path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" class="astro-vj4tpspi"></path> </svg> <span class="astro-vj4tpspi">Back to Top</span> </button> <div class="social-icons astro-wkojbtzc"> <span class="italic astro-wkojbtzc">Share this post on:</span> <div class="text-center astro-wkojbtzc"> <a href="https://wa.me/?text=https://blog.liyunfu.tech/posts/ssr-mvp/" class="group inline-block hover:text-skin-accent link-button astro-wkojbtzc" title="Share this post via WhatsApp"> <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="icon-tabler"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9"></path>
+      <path d="M9 10a0.5 .5 0 0 0 1 0v-1a0.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a0.5 .5 0 0 0 0 -1h-1a0.5 .5 0 0 0 0 1"></path>
+    </svg> <span class="sr-only astro-wkojbtzc">Share this post via WhatsApp</span> </a><a href="https://twitter.com/intent/tweet?url=https://blog.liyunfu.tech/posts/ssr-mvp/" class="group inline-block hover:text-skin-accent link-button astro-wkojbtzc" title="Tweet this post"> <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="icon-tabler"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z"></path>
+    </svg> <span class="sr-only astro-wkojbtzc">Tweet this post</span> </a><a href="https://t.me/share/url?url=https://blog.liyunfu.tech/posts/ssr-mvp/" class="group inline-block hover:text-skin-accent link-button astro-wkojbtzc" title="Share this post via Telegram"> <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="icon-tabler"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <path d="M15 10l-4 4l6 6l4 -16l-18 7l4 2l2 6l3 -4"></path>
+      </svg> <span class="sr-only astro-wkojbtzc">Share this post via Telegram</span> </a><a href="https://pinterest.com/pin/create/button/?url=https://blog.liyunfu.tech/posts/ssr-mvp/" class="group inline-block hover:text-skin-accent link-button astro-wkojbtzc" title="Share this post on Pinterest"> <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="icon-tabler"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <line x1="8" y1="20" x2="12" y2="11"></line>
+      <path d="M10.7 14c.437 1.263 1.43 2 2.55 2c2.071 0 3.75 -1.554 3.75 -4a5 5 0 1 0 -9.7 1.7"></path>
+      <circle cx="12" cy="12" r="9"></circle>
+    </svg> <span class="sr-only astro-wkojbtzc">Share this post on Pinterest</span> </a><a href="mailto:?subject=See%20this%20post&#38;body=https://blog.liyunfu.tech/posts/ssr-mvp/" class="group inline-block hover:text-skin-accent link-button astro-wkojbtzc" title="Share this post via email"> <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="icon-tabler"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+      <polyline points="3 7 12 13 21 7"></polyline>
+    </svg> <span class="sr-only astro-wkojbtzc">Share this post via email</span> </a> </div> </div>  </div> </main> <footer class="mt-auto astro-sz7xmlte"> <div class="max-w-3xl mx-auto px-0"> <hr class="border-skin-line" aria-hidden="true"> </div> <div class="footer-wrapper astro-sz7xmlte"> <div class="social-icons flex astro-upu6fzxr"> <a href="https://github.com/ohlyf" class="group inline-block hover:text-skin-accent link-button astro-upu6fzxr" title=" 编程笔记 on Github"> <svg
+    xmlns="http://www.w3.org/2000/svg"
+    class="icon-tabler"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+    <path
+      d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5"
+    ></path>
+  </svg> <span class="sr-only astro-upu6fzxr"> 编程笔记 on Github</span> </a><a href="mailto:liyunfu1998@qq.com" class="group inline-block hover:text-skin-accent link-button astro-upu6fzxr" title="Send an email to 编程笔记"> <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="icon-tabler"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+      <polyline points="3 7 12 13 21 7"></polyline>
+    </svg> <span class="sr-only astro-upu6fzxr">Send an email to 编程笔记</span> </a><a href="http://assets.liyunfu.tech/images/202402021149917.jpg" class="group inline-block hover:text-skin-accent link-button astro-upu6fzxr" title="编程笔记 on Wechat"> <svg t="1706845502614" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4355" width="200" height="200"><path d="M341.333333 298.666667a42.666667 42.666667 0 1 1 0 85.333333 42.666667 42.666667 0 0 1 0-85.333333z m426.666667 256a42.666667 42.666667 0 1 1 0 85.333333 42.666667 42.666667 0 0 1 0-85.333333z m-213.333333 0a42.666667 42.666667 0 1 1 0 85.333333 42.666667 42.666667 0 0 1 0-85.333333z m-42.666667-256a42.666667 42.666667 0 1 1 0 85.333333 42.666667 42.666667 0 0 1 0-85.333333z m-107.221333 407.168a416.64 416.64 0 0 1-26.026667-2.432l-132.693333 58.709333a71.68 71.68 0 0 1-81.536-17.578667 74.026667 74.026667 0 0 1-12.074667-82.432l23.722667-48.938666C118.485333 560.341333 85.333333 490.496 85.333333 417.194667 85.333333 255.658667 240.042667 128 426.666667 128c180.608 0 331.306667 119.552 340.864 273.621333 99.754667 34.602667 171.136 116.565333 171.136 214.656 0 57.088-25.173333 111.317333-69.034667 153.088l15.232 30.72a66.218667 66.218667 0 0 1-10.837333 74.666667 65.92 65.92 0 0 1-74.666667 15.829333l-101.674667-44.074666c-128.426667 14.848-246.485333-45.738667-292.906666-140.672zM384 618.026667v-1.706667C384 485.888 510.122667 384 661.333333 384c6.016 0 12.032 0.170667 17.962667 0.469333C659.626667 288.938667 555.093333 213.333333 426.666667 213.333333 283.904 213.333333 170.666667 306.773333 170.666667 417.194667c0 56.021333 30.165333 110.805333 83.712 149.845333a42.666667 42.666667 0 0 1 13.226666 53.077333l-24.149333 49.834667 111.957333-49.493333a42.666667 42.666667 0 0 1 23.893334-3.157334l4.693333 0.725334z m378.112 126.464l29.525333-21.12c39.68-28.330667 61.696-67.456 61.696-107.093334C853.333333 537.514667 768.938667 469.333333 661.333333 469.333333c-107.605333 0-192 68.181333-192 146.944 0 89.984 105.6 162.986667 227.968 144.213334l12.16-1.877334 11.264 4.906667 64.682667 27.989333-23.296-47.018666z" fill="#31303D" p-id="4356"></path></svg> <span class="sr-only astro-upu6fzxr">编程笔记 on Wechat</span> </a><a href="https://juejin.cn/user/2277843824292183" class="group inline-block hover:text-skin-accent link-button astro-upu6fzxr" title="编程笔记 on Juejin"> <svg t="1706845599300" class="icon" viewBox="0 0 1316 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5499" id="mx_n_1706845599301" width="200" height="200"><path d="M643.181714 247.698286l154.916572-123.172572L643.181714 0.256 643.072 0l-154.660571 124.269714 154.660571 123.245715 0.109714 0.182857z m0 388.461714h0.109715l399.579428-315.245714-108.361143-87.04-291.218285 229.888h-0.146286l-0.109714 0.146285L351.817143 234.093714l-108.251429 87.04 399.433143 315.136 0.146286-0.146285z m-0.146285 215.552l0.146285-0.146286 534.893715-422.034285 108.397714 87.04-243.309714 192L643.145143 1024 10.422857 525.056 0 516.754286l108.251429-86.893715L643.035429 851.748571z" fill="#2c2c2c" p-id="5500"></path></svg> <span class="sr-only astro-upu6fzxr">编程笔记 on Juejin</span> </a> </div>  <div class="copyright-wrapper astro-sz7xmlte"> <span class="astro-sz7xmlte">Copyright &#169; 2024</span> <span class="separator astro-sz7xmlte">&nbsp;|&nbsp;</span> <a href="http://beian.miit.gov.cn/" style="color:blue" class="astro-sz7xmlte">京ICP备2024045205号-1
+</a></div><a href="http://beian.miit.gov.cn/" style="color:blue" class="astro-sz7xmlte"></a></div><a href="http://beian.miit.gov.cn/" style="color:blue" class="astro-sz7xmlte"></a></footer><a href="http://beian.miit.gov.cn/" style="color:blue" class="astro-sz7xmlte"></a>  </body></html>  <script>
+  /** Attaches copy buttons to code blocks in the document,
+   * allowing users to copy code easily. */
+  function attachCopyButtons() {
+    let copyButtonLabel = "Copy";
+    let codeBlocks = Array.from(document.querySelectorAll("pre"));
+
+    for (let codeBlock of codeBlocks) {
+      let wrapper = document.createElement("div");
+      wrapper.style.position = "relative";
+
+      let copyButton = document.createElement("button");
+      copyButton.className =
+        "copy-code absolute right-3 -top-3 rounded bg-skin-card px-2 py-1 text-xs leading-4 text-skin-base font-medium";
+      copyButton.innerHTML = copyButtonLabel;
+      codeBlock.setAttribute("tabindex", "0");
+      codeBlock.appendChild(copyButton);
+
+      // wrap codebock with relative parent element
+      codeBlock.parentNode.insertBefore(wrapper, codeBlock);
+      wrapper.appendChild(codeBlock);
+
+      copyButton.addEventListener("click", async () => {
+        await copyCode(codeBlock, copyButton);
+      });
+    }
+
+    async function copyCode(block, button) {
+      let code = block.querySelector("code");
+      let text = code.innerText;
+
+      await navigator.clipboard.writeText(text);
+
+      // visual feedback that task is completed
+      button.innerText = "Copied";
+
+      setTimeout(() => {
+        button.innerText = copyButtonLabel;
+      }, 700);
+    }
+  }
+  attachCopyButtons();
+  document.addEventListener("astro:after-swap", attachCopyButtons);
+
+  /** Scrolls the document to the top when
+   * the "Back to Top" button is clicked. */
+  function backToTop() {
+    document.querySelector("#back-to-top")?.addEventListener("click", () => {
+      document.body.scrollTop = 0; // For Safari
+      document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+    });
+  }
+  backToTop();
+  document.addEventListener("astro:after-swap", backToTop);
+</script>
